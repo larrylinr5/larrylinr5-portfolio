@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid row h-100">
+        <div class="col-2">
+            <div class="list-group">
+                <input type="button" class="list-group-item list-group-item-action block" value='全區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='信義區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='大安區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='中山區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='松山區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='南港區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='中正區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='萬華區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='文山區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='大同區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='士林區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='內湖區'>
+                <input type="button" class="list-group-item list-group-item-action block" value='北投區'>
+            </div>
+        </div>
+        <div class="col-10">
+            <div id="map" class=""></div>
+        </div>
+    </div>
+
+    
+    <script>
+        var area = '全區'
+        var map;
+        $(function () {
+            $('.block').click(wherelocal);
+        });
+
+        function initMap() {
+            var myLatLng = {
+                lat: 25.0422592,
+                lng: 121.5372773
+            };
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: myLatLng
+            });
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: 'Hello World!'
+            });
+            var icons = {
+                ubike: {
+                    icon: 'bike.png'
+                },
+                bluebike: {
+                    icon: 'bike_blue.png'
+                }
+            };
+            var features = GetU();
+
+            console.log(features);
+            // Create markers.
+            for (var i = 0; i < features.length; i++) {
+                console.log("aaa");
+                var marker = new google.maps.Marker({
+                    position: features[i].position,
+                    icon: icons[features[i].type].icon,
+                    map: map,
+                    title: features[i].title
+                });
+            };
+        }
+        //U位置
+        function GetU() {
+            //  [{
+            //     position: new google.maps.LatLng(25.0422592, 121.5372773),
+            //     type: 'ubike'
+            // }];
+            var data = [];
+            //呼叫opendata
+            var opendata = GetOp();
+            console.log('opendata is', opendata)
+            //顯示每一個item的值
+            $.each(opendata.retVal, function (i, item) {
+                console.log("i is", i);
+                console.log("item is", item);
+                var single = {
+                    position: new google.maps.LatLng(item.lat, item.lng),
+                    type:  'ubike',
+                    title: item.sbi + "/" + item.tot,
+                }
+                if (item.sbi < 10) {
+                    single.type = 'bluebike'
+                }
+                if (item.sarea == area || area == '全區' ) {
+                    data.push(single)
+                }
+
+            });
+            return data;
+        }
+        //取得opendata
+        function GetOp() {
+            var ublocation;
+
+            $.ajax({
+                type: 'Get',
+                url: 'https://tcgbusfs.blob.core.windows.net/blobyoubike/YouBikeTP.json',
+                success: function (data) {
+                    console.log('data is', data);
+                    ublocation = data;
+                },
+                error: function () {
+                    alert('fail');
+                },
+                async: false,
+            });
+            return ublocation;
+        }
+        function wherelocal() {
+            area = $(this).val()
+            //.siblings()方法是(選擇)當下選擇器選取的東西以外的同一階層的標籤
+            //$(this).addClass('active').siblings().removeClass('active')
+            initMap();
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlKWP4uWjQIR3WDAWLAu6rUhBfc3_ppag&callback=initMap"
+        async defer></script>
+</body>
+
+</html>

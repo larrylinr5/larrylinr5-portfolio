@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>翻譯機</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+    <script>
+        function init() {
+            $('#textleft').val(localStorage.getItem("a1"));
+            $('#left').click(function () {
+                let source = $('#textleft').val();
+                let valure = $('#select').val();
+                localStorage.setItem("a1",source);
+                trans(source, valure, true);
+
+            });
+            $('#right').click(function () {
+                let source = $('#textright').val();
+                let valure = "5";
+                trans(source, valure, false);
+
+            });
+            $('#select').change(function(){
+                if($('#select').val()=="0")
+                {
+                    $('#left').html("中翻英");
+                    $('#right').html("英翻中");
+                }
+                if($('#select').val()=="1")
+                {
+                    $('#left').html("中翻法");
+                    $('#right').html("法翻中");
+                }
+                if($('#select').val()=="2")
+                {
+                    $('#left').html("中翻德");
+                    $('#right').html("德翻中");
+                }
+                if($('#select').val()=="3")
+                {
+                    $('#left').html("中翻日");
+                    $('#right').html("日翻中");
+                }
+                if($('#select').val()=="4")
+                {
+                    $('#left').html("中翻韓");
+                    $('#right').html("韓翻中");
+                }
+            });
+        }
+
+        function trans(source, valure, flag) {
+            $.ajax({
+                type: "post", //http verb
+                headers: {
+                    //http header
+                    "Ocp-Apim-Subscription-Key": "4ffc83c1b35340fe92a5cc9d37360ad9",
+                    "Content-Type": "application/json"
+                },
+                url: "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=en&to=fr&to=de&to=ja&to=ko&to=zh-Hant",
+                data: JSON.stringify([{
+                    "Text": source
+                }]), //要翻譯的文字
+                dataType: "json",
+                success: function (response) {
+                    //呼叫遠端服務後的回傳結果
+                    flag == true ? $('#textright').val(response[0].translations[valure].text) : $(
+                            '#textleft')
+                        .val(response[0].translations[valure].text);
+                }
+            })
+        }
+        $(function () {
+            init();
+        });
+    </script>
+
+
+</head>
+
+<body>
+    <div class="container-fluid text-center row" style="margin: 0 auto">
+        <div class="card col-4 p-0">
+            <div class="card-header bg-primary text-white h1">
+                外語翻譯框
+            </div>
+            <div class="card-body">
+                <textarea id="textleft" class="form-control" cols="50" rows="8"></textarea>
+            </div>
+        </div>
+
+
+        <div class="col-4  col-md-4 d-flex justify-content-around flex-md-column my-5">
+            <div class="order-2 order-md-1">
+                <button id="left" class="btn btn-primary w-1  rotate-md-l-90 order-2 order-md-1" type="button"
+                    style="font-size: 50px">中翻英</button>
+            </div>
+            <div class="order-1 order-md-2">
+                <button id="right" class="btn btn-primary rotate-md-l-90" type="button"
+                    style="font-size: 50px">英翻中</button>
+            </div>
+            <div>
+                <select id="select">
+                    <option value="0">翻譯成英文</option>
+                    <option value="1">翻譯成法文</option>
+                    <option value="2">翻譯成德文</option>
+                    <option value="3">翻譯成日文</option>
+                    <option value="4">翻譯成韓文</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="card col-4 p-0">
+            <div class="card-header bg-primary text-white h1">
+                中文翻譯框
+            </div>
+            <div class="card-body">
+                <textarea id="textright" class="form-control" cols="50" rows="8"></textarea>
+            </div>
+        </div>
+
+    </div>
+    </div>
+</body>
+
+</html>

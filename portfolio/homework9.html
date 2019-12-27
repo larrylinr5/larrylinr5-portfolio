@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="stylesheets/homework9.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script>
+        //getElementById(抓取頁面上的元素)
+        function getElement(name) {
+            return document.getElementById(name);
+        }
+
+        //判斷是否可以送件
+        function Button_Submit() {
+            //抓取頁面上的checkboc1，取得是否checked
+            var isChecked = getElement('MustCheck').checked;
+            //如果是，就return true
+            if (isChecked) return true;
+            //否則就... 
+            alert('必須勾選同意!');
+            return false;
+        }
+
+        //當網頁載入完成後執行
+        window.onload = function () {
+            //hook event(在form1被submit時...)
+            getElement('form1').onsubmit = function () {
+                //呼叫 Button_Submit()
+                return Button_Submit();
+            };
+        };
+    </script>
+
+</head>
+
+<body>
+    <form id="form1"
+        action=" http://isbaas.azurewebsites.net/WebForms/Form2Mail.aspx?mailto=howdii69@gmail.com&redirect=http://www.google.com"
+        method="POST">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-head bg-primary text-white" id="a2">個人資料--必填</div>
+                        <div class="card-body bg-success text-red">
+                            <div>
+                                <label>姓名 : </label>
+                                <input type="text" class="form-control" name="account" placeholder="請輸入姓名" size="10">
+                            </div>
+                            <div>
+                                <label>密碼 :</label>
+                                <input type="password" class="form-control" name="psw"" placeholder=" 請輸入密碼" size="10">
+                            </div>
+                            <div>
+                                <label>性別 :</label>
+                                <input type="radio" name="gender" value="0">男
+                                <input type="radio" name="gender" value="1">女
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-head bg-primary text-white" id="a2">個人資料--興趣</div>
+                        <div class="card-body bg-success text-red">
+
+                            <div>
+                                <label>興趣 :</label>
+                                <input type="checkbox" name="hobby" value="音樂">音樂
+                                <input type="checkbox" name="hobby" value="運動">運動
+                                <input type="checkbox" name="hobby" value="閱讀">閱讀
+                                <input type="checkbox" name="hobby" value="電影">電影
+                            </div>
+                            <div>
+                                <label>專長 :</label>
+                                <textarea name="filedMutiText" class="form-control" id="filedMutiText" cols="40"
+                                    rows="5"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-head bg-primary text-white" id="a2">個人資料--地址</div>
+                        <div class="card-body bg-success text-red">
+
+                            <div>
+                                <label>郵遞區號 :</label>
+                                <input type="text" name="mailNum" class="form-control" placeholder="請輸入郵遞區號" size="10">
+                            </div>
+                            <div>
+                                <label>縣市 :</label>
+                                <select name="livingIn">
+                                    <option value="TPE" selected>台北市</option>
+                                    <option value="TPH">新北市</option>
+                                    <option value="TYC">桃園市</option>
+                                    <option value="HSC">新竹市</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>其它地址 :</label>
+                                <input type="text" class="form-control" name="otherAdress" placeholder="請輸入地址"
+                                    size="30">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br><br>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div>
+                        <input type="checkbox" id="MustCheck" name="MustCheck">同意你隨便用個資...
+                    </div>
+                    <br>
+                    <div>
+                        <input type="submit" class="btn btn-primary" value="輸入">
+                        <input type="reset" class="btn btn-primary" value="清除">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</body>
+
+</html>

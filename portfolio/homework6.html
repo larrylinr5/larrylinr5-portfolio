@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        td {
+            width: 150px;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        var flag = true;
+        function Setpoint(obj) {
+            if (obj.innerText != '') return;
+            if (flag) {
+                obj.innerText = 'O';
+                flag = false;
+            }
+            else {
+                obj.innerText = 'X';
+                flag = true;
+            }
+
+            if (checkRow()) {
+                if (flag == true) {
+                    if (confirm("玩家2贏了!\n\n要再玩一場嗎?"))
+                        clearTable();
+                }
+                else if (flag == false) {
+                    if (confirm("玩家1贏了!\n\n要再玩一場嗎?"))
+                        clearTable();
+                }
+            }
+            else if (tableIsFull()) {
+                if (confirm("平手\n\n要再玩一場嗎?"))
+                    clearTable();
+            }
+        }
+        function checkRow() {
+
+            for (i = 0; i <= 2; i++) {
+                // 列
+                if (eval("compare(" + "a" + i + "0" + "," + "a" + i + "1" + "," + "a" + i + "2" + ")"))
+                    return true;
+
+
+                // 對角線
+                if (eval("compare(" + "a" + "0" + i + "," + "a" + "1" + "1" + "," + "a" + "2" + (2 - i) + ")"))
+                    return true;
+
+                // 欄
+                if (eval("compare(" + "a" + "0" + i + "," + "a" + "1" + i + "," + "a" + "2" + i + ")"))
+                    return true;
+            }
+            return false;
+
+
+        }
+        function compare(obj0, obj1, obj2) {
+            if (obj0.innerText != "" && obj1.innerText != "" && obj2.innerText != "")
+                if (obj0.innerText == obj1.innerText && obj1.innerText == obj2.innerText)
+                    return true;
+
+            return false;
+        }
+        function tableIsFull() {
+            for (i = 0; i <= 2; i++)
+                for (j = 0; j <= 2; j++)
+                    if (eval("a" + i + j).innerText == "")
+                        return false;
+            return true;
+        }
+        function clearTable() {
+            for (i = 0; i <= 2; i++) {
+                eval("a" + i + "0" + ".innerHTML = '';")
+                eval("a" + i + "1" + ".innerHTML = '';")
+                eval("a" + i + "2" + ".innerHTML = '';")
+            }
+            flag = true;
+        }
+
+    </script>
+    <title>Document</title>
+</head>
+
+<body>
+    <table id='table1' border="1" style="width: 500px;height: 500px;font-size: 60px;">
+        <caption>
+            OOXX</caption><br />
+        玩家1 : O<br />
+        玩家2 : X<br />
+        </caption>
+
+        <tr style="height: 100px;">
+            <td id="a00" style="width: 100px" onclick="Setpoint(this)"></td>
+            <td id="a01" style="width: 100px" onclick="Setpoint(this)"></td>
+            <td id="a02" style="width: 100px" onclick="Setpoint(this)"></td>
+        </tr>
+        <tr style="height: 100px;">
+            <td id="a10" onclick="Setpoint(this)"></td>
+            <td id="a11" onclick="Setpoint(this)"></td>
+            <td id="a12" onclick="Setpoint(this)"></td>
+        </tr>
+        <tr style="height: 100px;">
+            <td id="a20" onclick="Setpoint(this)"></td>
+            <td id="a21" onclick="Setpoint(this)"></td>
+            <td id="a22" onclick="Setpoint(this)"></td>
+        </tr>
+
+
+    </table>
+</body>
+
+</html>

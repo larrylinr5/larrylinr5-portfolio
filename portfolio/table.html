@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <!-- https://cdnjs.com/libraries/jquery-tagsinput -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/jquery-tagsinput/1.3.6/jquery.tagsinput.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-tagsinput/1.3.6/jquery.tagsinput.min.js"></script>
+
+    <!-- JQ-DataTable -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        function init() {
+
+            //新增輸入視窗按鈕的事件
+            $('#ButtonShowAdd').click(ButtonShowAdd1);
+            //新增按鈕功能事件
+            $('#ButtonAddNew').click(ButtonAddNew1);
+            //匯出事件
+            $('#export').click(ModalDataExport);
+            //匯入事件
+            $('#import').click(ButtonShowImport);
+            //匯入
+            $('#ButtonImport').click(ButtonImport);
+            //更新
+            $('#ButtonUpdate').click(ButtonUpdate);
+            //刪除
+            $('#ButtonDelete').click(ButtonDelete);
+            // $('#myTable').DataTable();
+            dt = $('#myTable').DataTable({
+                data: dat
+            });
+            //參考: https://datatables.net/examples/advanced_init/events_live.html
+            //event on 選取特定row
+            $('#myTable tbody').on('click', 'tr', function () {
+                CurrentEditItem = dt.row(this).data();
+                //alert(CurTrentEditItem);
+                $('#ModalEdit').modal();
+                $('#EditField_Name').val(CurrentEditItem[0]);
+                $('#EditField_Birthday').val(CurrentEditItem[1]);
+                $('#EditField_TEL').val(CurrentEditItem[2]);
+                $('#EditField_Email').val(CurrentEditItem[3]);
+                $('#EditField_Address').val(CurrentEditItem[4]);
+                $('#EditField_other').importTags(CurrentEditItem[5]);
+            });
+            LoadData();
+        }
+
+        function ButtonUpdate() {
+            //取得當前編輯資料
+            var NewItem = [
+                $('#EditField_Name').val(),
+                $('#EditField_Birthday').val(),
+                $('#EditField_TEL').val(),
+                $('#EditField_Email').val(),
+                $('#EditField_Address').val(),
+                $('#EditField_other').val()
+            ];
+            //找到當前筆數
+            var n = dat.indexOf(CurrentEditItem);
+            //置換
+            dat[n] = NewItem;
+            //refresh data table
+            ref();
+            SaveData();
+        }
+
+        function ButtonDelete() {
+            var n = dat.indexOf(CurrentEditItem);
+            dat.splice(n, 1);
+            //refresh data table
+            ref();
+            SaveData();
+        }
+
+        function ButtonImport() {
+            dat = JSON.parse($('#field_DataJSON').val());
+
+            ref();
+            SaveData();
+        }
+
+        function ButtonShowImport() {
+            $('#field_DataJSON').val('');
+            $('#field_DataJSON').attr('readonly', false);
+            $('#ButtonImport').removeAttr("disabled");
+            $('#ModalDataExport').modal();
+        }
+
+        function ModalDataExport() {
+            var str = JSON.stringify(dat);
+            //填入 
+            $('#field_DataJSON').val(str);
+            $('#field_DataJSON').attr('readonly', 'readonly');
+            $('#ButtonImport').attr('disabled', 'true');
+            $('#ModalDataExport').modal();
+        }
+
+        function ButtonShowAdd1() {
+            $('#ModalAddNew').modal();
+        }
+
+        function ButtonAddNew1() {
+
+
+            var item = [
+                $('#field_1').val(),
+                $('#field_2').val(),
+                $('#field_3').val(),
+                $('#field_4').val(),
+                $('#field_5').val(),
+                $('#field_6').val()
+            ];
+            //新增一個元素
+            dat.push(item);
+            //儲存資料
+            SaveData();
+            //清乾淨表單
+            cleandesk();
+            //載入資料
+            LoadData();
+        }
+        //刷新方法
+        function ref() {
+            dt.clear();
+            dt.rows.add(dat);
+            dt.draw();
+        }
+        //儲存方法
+        function SaveData() {
+            var str = JSON.stringify(dat);
+            localStorage.setItem('AddressBook', str);
+        }
+        //刷新方法
+        function cleandesk() {
+            $('#field_1').val(''),
+                $('#field_2').val(''),
+                $('#field_3').val(''),
+                $('#field_4').val(''),
+                $('#field_5').val(''),
+                $('#field_6').importTags('')
+        }
+        //載入資料
+        function LoadData() {
+            if (localStorage.getItem('AddressBook') != null) {
+                var str = localStorage.getItem('AddressBook');
+                //取回資料
+                dat = JSON.parse(str);
+            }
+            //刷新頁面
+            $('#field_6').tagsInput();
+            $('#EditField_other').tagsInput();
+            ref();
+        }
+        //預設資料
+        var dat = [
+            ['Eric', '0912345678', '1980/1/1', 'eric@gmail.com', '台北市光復南路179號13樓', '123'],
+        ];
+        $(function () {
+            init();
+        });
+    </script>
+</head>
+
+<body>
+    <!-- 主選單 -->
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky">
+        <button class="navbar-brand">個人通訊錄</button>
+        <!-- link -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <button class="btn btn-primary" id="ButtonShowAdd">新增</button>
+            </li>
+            <li class="nav-item">
+                <button id="import" style="margin-left: 10px;" class="btn btn-danger">匯入</button>
+                <button id="export" style="margin-left: 10px;" class="btn btn-danger">匯出</button>
+            </li>
+        </ul>
+        <!-- 沒功能的搜尋
+        <form action="/action_page.php" class="form-inline" style="margin-left: 10px;">
+            <input type="text" class="form-control mr-sm-2" placeholder="輸入搜尋文字">
+            <button class="btn btn-success" id="buttonsearch" type="submit">搜尋</button>
+        </form> -->
+    </nav>
+    <!-- 主要顯示區 table -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <table id="myTable" class="display">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>生日</th>
+                            <th>電話</th>
+                            <th>Email</th>
+                            <th>地址</th>
+                            <th>其他</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal -->
+    <div class="modal fade" id="ModalAddNew">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">新增</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form>
+                        <label>姓名</label>
+                        <input id="field_1" type="text" class="form-control" />
+                        <label>生日</label>
+                        <input id="field_2" type="datetime" class="form-control" />
+                        <label>電話</label>
+                        <input id="field_3" type="tel" class="form-control" />
+                        <label>email</label>
+                        <input id="field_4" type="email" class="form-control" />
+                        <label>地址</label>
+                        <input id="field_5" type="address" class="form-control" />
+                        <label>其他</label>
+                        <input id="field_6" type="other" class="form-control" />
+                    </form>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button id="ButtonAddNew" type="button" class="btn btn-primary">新增</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal : ModalDataExport -->
+    <div class="modal fade" id="ModalDataExport">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">資料匯出匯入</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <textarea id="field_DataJSON" class="form-control" cols="60" rows="10"></textarea>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button id="ButtonImport" type="button" class="btn btn-primary" data-dismiss="modal">匯入</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal -->
+    <div class="modal fade" id="ModalEdit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">修改或刪除</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form>
+                        <label>姓名</label>
+                        <input id="EditField_Name" type="text" class="form-control" />
+                        <label>生日</label>
+                        <input id="EditField_Birthday" type="datetime" class="form-control" />
+                        <label>電話</label>
+                        <input id="EditField_TEL" type="tel" class="form-control" />
+                        <label>email</label>
+                        <input id="EditField_Email" type="email" class="form-control" />
+                        <label>地址</label>
+                        <input id="EditField_Address" type="address" class="form-control" />
+                        <label>其他</label>
+                        <input id="EditField_other" type="other" class="form-control" />
+                    </form>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button id="ButtonUpdate" type="button" class="btn btn-primary" data-dismiss="modal">儲存</button>
+                    <button id="ButtonDelete" type="button" class="btn btn-danger" data-dismiss="modal">刪除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

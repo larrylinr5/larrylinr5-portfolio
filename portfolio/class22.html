@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script>
+        var getn = 0;
+        var a1 = 0;
+        var a2 = 0;
+        var a3 = 0;
+        var ansss = true;
+
+        function init() {
+            $('#b1').click(function () {   
+                getn = $('#getsec').val();
+                ansss = true;
+                change();
+            });
+            $('#b2').click(function () {
+                ansss=false;
+                change();
+            });
+            $('#b3').click(function () {
+                ansss=true;
+                change();
+            });
+        }
+
+
+
+        function change() {
+            if(ansss==false) return;
+            
+            //round 無條件進位
+            a1 = Math.floor(getn % 60);
+            a2 = Math.floor((getn / 60) % 60);
+            a3 = Math.floor((getn / 3600) % 60);
+            $('#time').html(`${a3}:${a2}:${a1}`);
+            if(getn==0) return;
+            getn--;
+            setTimeout(change, 1000);
+        }
+        $(function () {
+            init();
+        });
+    </script>
+    <style>
+        @font-face {
+            font-family: DigiFont;
+            src: url('digital-7 (italic).ttf');
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="text-center ">
+            <h2>倒數</h2>
+            <input type="text" id="getsec" placeholder="請輸入秒數">
+            <br>
+            <h1 id="time" style="font-family: DigiFont">XX:XX:XX</h1>
+            <input id="b1" class="btn btn-primary " type="button" value="開始">
+            <input id="b2" class="btn btn-primary " type="button" value="暫停">
+            <input id="b3" class="btn btn-primary " type="button" value="繼續">
+        </div>
+    </div>
+</body>
+
+</html>
